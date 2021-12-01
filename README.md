@@ -2,19 +2,19 @@
 
 [Advent of Code](https://adventofcode.com/) is back! Last year (and the year before that), I took a stab at it using [Elixir](https://elixir-lang.org/), but only had time to solve two problems. This year I’m trying again.
 
-I’ve only used Elixir a few times, so I’m hoping that a month of consistent floundering with Elixir will expand my mental paradigm of what programming actually can be (like Ruby, Clojure, and functional programming). So, onward to the code:
+I’ve used Elixir only sparingly, so hopefully a month of consistent floundering will expand my mental paradigm of what “programming” actually looks like (as Ruby, Clojure, functional programming, etc. have). So, onward to the code:
 
 ## Instructions
 
-Assuming that Elixir is [installed on your system](https://elixir-lang.org/install.html):
+Assuming that Elixir is [installed](https://elixir-lang.org/install.html):
 
 1. Solving the day’s problem:
 
-   `elixir day-01/solve.exs`
+   `elixir day-01/solution.exs`
 
 2. Running tests:
 
-   `elixir -r day-01/solve.exs day-01/test.exs`
+   `elixir -r day-01/solution.exs day-01/tests.exs`
 
 ## Lessons Learned
 
