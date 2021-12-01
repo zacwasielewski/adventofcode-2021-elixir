@@ -21,11 +21,11 @@ defmodule Day1Test do
   end
     
   test "sum_sliding_window_example" do
-    assert Day1.sum_sliding_window(@example_input) === [ 607, 618, 618, 617, 647, 716, 769, 792 ]
+    assert Day1.sum_sliding_window(@example_input, 3) === [ 607, 618, 618, 617, 647, 716, 769, 792 ]
   end
     
   test "part_2_example" do
-    windowed_input = Day1.sum_sliding_window(@example_input)
+    windowed_input = Day1.sum_sliding_window(@example_input, 3)
     assert Day1.count_depth_increases(windowed_input) === 5
   end
 end
