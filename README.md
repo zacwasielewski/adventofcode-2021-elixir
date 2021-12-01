@@ -20,19 +20,20 @@ Assuming that Elixir is [installed on your system](https://elixir-lang.org/insta
 
 ### Day 1:
 
-The [Elixir docs](https://hexdocs.pm/elixir/) are great and comprehensive and the examples are often relevant to actual problems, compared to many languages. 
+1. The [Elixir docs](https://hexdocs.pm/elixir/) are great and comprehensive and the examples are often relevant to _actual_ problems, compared to many languages. 
 
-[`IO.inspect/2` works within pipelines](https://blog.appsignal.com/2021/11/30/three-ways-to-debug-code-in-elixir.html), which is very convenient for debugging. I’ll be using this trick often:
+2. [`IO.inspect/2` works within pipelines](https://blog.appsignal.com/2021/11/30/three-ways-to-debug-code-in-elixir.html), which is very convenient for debugging. I’ll be using this trick often:
 
-```
-[1, 2, 3]
-|> IO.inspect(label: "before")
-|> Enum.map(&(&1 * 2))
-|> IO.inspect(label: "after")
-|> Enum.sum
+   ```
+   [1, 2, 3]
+   |> IO.inspect(label: "before")
+   |> Enum.map(&(&1 * 2))
+   |> IO.inspect(label: "after")
+   |> Enum.sum
+   
+   # before: [1, 2, 3]
+   # after: [2, 4, 6]
+   # 12
+   ```
 
-# before: [1, 2, 3]
-# after: [2, 4, 6]
-# 12
-```
-
+3. Maybe/probably I’m overusing pipelines, but their tidy syntax works for my brain, and [it’s striking](https://github.com/zacwasielewski/adventofcode-2021-elixir/commit/b3d29d08ee8e8a09232e9d73ec42b32346c20554) how effectively they reduce the need to solve one of the [two hard things in Computer Science](https://martinfowler.com/bliki/TwoHardThings.html). 🔥
