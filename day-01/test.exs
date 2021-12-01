@@ -5,9 +5,17 @@ defmodule Day1Test do
 
   test "part_1_test_1" do
   	input = [
-  		"Hello there",
-      "And hi to you"
-  	]
-  	assert Day1.reverse_and_concatenate_the_input(input) === "ereht olleH|uoy ot ih dnA"
+      199,
+      200,
+      208,
+      210,
+      200,
+      207,
+      240,
+      269,
+      260,
+      263,
+    ]
+  	assert Day1.count_depth_increases(input) === 7
   end
 end

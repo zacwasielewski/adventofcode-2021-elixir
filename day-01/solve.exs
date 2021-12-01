@@ -6,19 +6,20 @@ defmodule Day1 do
 		
 		input
 		|> String.split("\n", trim: true)
+		|> Enum.map(&String.to_integer/1)
   end
 
-	def reverse_and_concatenate_the_input(input) do
-		input
-		|> Enum.map(&String.reverse/1)
-		|> Enum.join("|")
+	
+	def count_depth_increases(input) do
+		pairs = Enum.chunk_every(input, 2, 1, :discard)
+		Enum.count(pairs, fn [a, b] -> b > a end)
 	end
 	
 	@doc """
-		
+		How many measurements are larger than the previous measurement?
 	"""
 	def part1 do
-		reverse_and_concatenate_the_input get_input()
+		count_depth_increases get_input()
 	end
 end
 
