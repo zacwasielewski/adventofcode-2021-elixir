@@ -16,16 +16,23 @@ defmodule Day2Test do
   #  263,
   #]
   
-  test "count_depth_increases_example" do
-    #assert Day1.count_depth_increases(@example_input) === 7
-  end
+  test "part_1_example" do
+    input = [
+      "forward 5",
+      "down 5",
+      "forward 8",
+      "up 3",
+      "down 8",
+      "forward 2"
+    ]
     
-  test "sum_sliding_window_example" do
-    #assert Day1.sum_sliding_window(@example_input, 3) === [ 607, 618, 618, 617, 647, 716, 769, 792 ]
-  end
-    
-  test "part_2_example" do
-    #windowed_input = Day1.sum_sliding_window(@example_input, 3)
-    #assert Day1.count_depth_increases(windowed_input) === 5
+    assert [ 15, 10 ] ==
+      input
+      |> Day2.calculate_position
+
+    assert 150 ==
+      input
+      |> Day2.calculate_position
+      |> Day2.calculate_position_product
   end
 end
