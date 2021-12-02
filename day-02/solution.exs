@@ -8,38 +8,26 @@ defmodule Day2 do
 end
 
 defmodule Day2.Part1 do
-  import Day2
-  
-  def calculate_depth(input) do
+  def sum_moves_by_direction(input, direction) do
     input
-    |> Enum.filter(fn x -> String.starts_with?(x, ["up", "down"]) end)
-    |> Enum.map(fn x -> String.replace_prefix(x, "up ", "-") end)
-    |> Enum.map(fn x -> String.replace_prefix(x, "down ", "") end)
+    |> Enum.filter(fn x -> String.starts_with?(x, direction) end)
+    |> Enum.map(fn x -> String.replace(x, direction, "") end)
+    |> Enum.map(&String.trim/1)
     |> Enum.map(&String.to_integer/1)
     |> Enum.sum()
   end
   
-  def calculate_horizontal(input) do
-    input
-    |> Enum.filter(fn x -> String.starts_with?(x, "forward") end)
-    |> Enum.map(fn x -> String.replace_prefix(x, "forward ", "") end)
-    |> Enum.map(&String.to_integer/1)
-    |> Enum.sum()
-  end
+  def solve(input) do
+    forward = sum_moves_by_direction(input, "forward")
+    up = sum_moves_by_direction(input, "up")
+    down = sum_moves_by_direction(input, "down")
+    depth = down - up
     
-  def calculate_solution(input) do
-    calculate_depth(input) * calculate_horizontal(input)
+    forward * depth
   end
-
-  def solve do
-    get_input()
-    |> calculate_solution
-  end  
 end
 
 defmodule Day2.Part2 do
-  import Day2
-    
   def parse_input(input) do
     input
     |> Enum.map(fn line -> String.split(line, " ") end)
@@ -57,22 +45,20 @@ defmodule Day2.Part2 do
     end
   end
 
-  def calculate_position(input) do
+  def move_submarine(input) do
     initial = %{ horizontal: 0, depth: 0, aim: 0 }
     Enum.reduce(input, initial, fn move, acc -> next_position(acc, move) end)
   end
-
-  def calculate_solution(position) do    
-    position[:horizontal] * position[:depth]
-  end
   
-  def solve do
-    get_input()
+  def solve(input) do
+    position = input
     |> parse_input
-    |> calculate_position
-    |> calculate_solution
+    |> move_submarine
+    
+    answer = position[:horizontal] * position[:depth]
   end
 end
 
-IO.puts "Part 1: #{Day2.Part1.solve}"
-IO.puts "Part 2: #{Day2.Part2.solve}"
+input = Day2.get_input()
+IO.puts "Part 1: #{Day2.Part1.solve(input)}"
+IO.puts "Part 2: #{Day2.Part2.solve(input)}"

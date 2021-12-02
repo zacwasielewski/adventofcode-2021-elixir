@@ -15,9 +15,11 @@ defmodule Day2Test do
   test "part_1_example" do
     input = @example_input
 
-    assert 15  == input |> Day2.Part1.calculate_horizontal
-    assert 10  == input |> Day2.Part1.calculate_depth
-    assert 150 == input |> Day2.Part1.calculate_solution
+    assert 3  == input |> Day2.Part1.sum_moves_by_direction("up")
+    assert 13 == input |> Day2.Part1.sum_moves_by_direction("down")
+    assert 15 == input |> Day2.Part1.sum_moves_by_direction("forward")
+
+    assert 150 == input |> Day2.Part1.solve
   end
   
   test "part_2_example" do
@@ -25,11 +27,9 @@ defmodule Day2Test do
     
     assert %{aim: 10, depth: 60, horizontal: 15} ==
       input
-      |> Day2.Part2.calculate_position
+      |> Day2.Part2.move_submarine
   
-    assert 900 ==
-      input
-      |> Day2.Part2.calculate_position
-      |> Day2.Part2.calculate_solution
+    position = input |> Day2.Part2.move_submarine
+    assert 900 == (position[:horizontal] * position[:depth])
   end
 end
