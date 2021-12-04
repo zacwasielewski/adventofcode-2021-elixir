@@ -50,3 +50,7 @@ Assuming that Elixir is [installed](https://elixir-lang.org/install.html):
    ```
 
 2. [Nested modules aren’t a thing](https://toranbillups.com/blog/archive/2018/10/04/nested-modules-in-elixir/), really. I mean, kind of. They do exist, and share `import`s and `alias`es, but not functions.
+
+### Day 3:
+
+I tried *really* hard to use bitwise operators on Part 1, but it turns out I don't understand how Elixir handles binary strings. And that strategy wouldn’t have worked for Part 2 anyway, so I wasted a bunch of time on an unnecessary premature optimization.
