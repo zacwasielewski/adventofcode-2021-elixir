@@ -5,9 +5,7 @@ defmodule Day4 do
     {:ok, input} = File.read(@input_file)
     input
   end
-end
-
-defmodule Day4.Part1 do  
+  
   def parse_input(input) do
     [ head | tail ] = String.split(input, "\n\n", trim: true)
     %{ numbers: parse_numbers(head), boards: parse_boards(tail) }
@@ -66,7 +64,15 @@ defmodule Day4.Part1 do
     |> Enum.sum
   end
   
-  def play_bingo(boards, numbers) do    
+  def calculate_score(board, final_number) do
+    sum_board(board) * final_number
+  end
+end
+
+defmodule Day4.Part1 do
+  import Day4
+
+  def first_winning_board(boards, numbers) do    
     numbers
     |> Enum.reduce_while(boards, fn number, acc ->
         marked_boards = Enum.map(acc, fn board -> mark_board(board, number) end)
@@ -79,19 +85,51 @@ defmodule Day4.Part1 do
         end
       end)
   end
-  
-  def calculate_winning_score(board, winning_number) do
-    sum_board(board) * winning_number
+    
+  def solve(input) do    
+    %{ boards: boards, numbers: numbers } = parse_input(input)      
+    %{ number: winning_number, board: winning_board } = first_winning_board(boards, numbers)
+
+    calculate_score(winning_board, winning_number)      
+  end
+end
+
+defmodule Day4.Part2 do
+  import Day4
+
+  def winning_boards(boards, numbers) do
+    initial = %{ boards: boards, number: nil, winning_boards: [] }
+    
+    numbers
+    |> Enum.reduce(initial, fn number, acc ->
+        %{ boards: boards, winning_boards: winning_boards } = acc
+        
+        new_winning_boards = boards
+        |> Enum.map(fn board ->
+            marked = mark_board(board, number)
+            if !winning_board?(board) && winning_board?(marked), do: %{ board: marked, number: number }, else: nil
+          end)
+
+        marked = Enum.map(boards, fn x -> mark_board(x, number) end)
+          
+        %{ acc |
+          boards: marked,
+          winning_boards: Enum.reject(winning_boards ++ new_winning_boards, &is_nil/1)
+        }
+      end)
+      |> Map.fetch!(:winning_boards)
   end
   
   def solve(input) do    
     %{ boards: boards, numbers: numbers } = parse_input(input)      
-    %{ number: winning_number, board: winning_board } = play_bingo(boards, numbers)
+    
+    winning_boards = winning_boards(boards, numbers)
+    %{ board: last_winning_board, number: last_winning_number } = Enum.at(winning_boards, -1)
 
-    calculate_winning_score(winning_board, winning_number)      
+    calculate_score(last_winning_board, last_winning_number)
   end
 end
 
 input = Day4.get_input()
 IO.puts "Part 1: #{Day4.Part1.solve(input)}"
-#$IO.puts "Part 2: #{Day4.Part2.solve(input)}"
+IO.puts "Part 2: #{Day4.Part2.solve(input)}"
