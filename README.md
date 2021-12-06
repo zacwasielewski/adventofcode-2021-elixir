@@ -54,3 +54,17 @@ Assuming that Elixir is [installed](https://elixir-lang.org/install.html):
 ### Day 3:
 
 I tried *really* hard to use bitwise operators on Part 1, but it turns out I don't understand how Elixir handles binary strings. And that strategy wouldn’t have worked for Part 2 anyway, so I wasted a bunch of time on an unnecessary premature optimization.
+
+
+### Day 5:
+
+Destructuring, wow. It's amazing that this:
+
+    [startpoint, endpoint] = line
+    x = Enum.at(endpoint, 0) - Enum.at(startpoint, 0)
+    y = Enum.at(endpoint, 1) - Enum.at(startpoint, 1)
+
+
+   ```elixir
+   [[x1, y1], [x2, y2]] = line
+   ```
