@@ -31,6 +31,11 @@ defmodule Day05Test do
     |> Enum.count()
 
     assert solution == 5
-
+  end
+  
+  test "part2_example" do
+    
+    
+    
   end
 end
