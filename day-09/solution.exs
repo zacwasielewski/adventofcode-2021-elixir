@@ -5,9 +5,7 @@ defmodule Day9 do
     {:ok, input} = File.read(@input_file)
     input
   end
-end
-
-defmodule Day9.Part1 do
+  
   def parse_input(input) do
     input
     |> String.split("\n", trim: true)
@@ -24,34 +22,44 @@ defmodule Day9.Part1 do
     { rows, cols }
   end
   
-  def height(matrix, row, col) do
+  def in_matrix?(matrix, row, col) do
     {rows, cols} = matrix_size(matrix)
-    
+        
     cond do
-      row < 0 -> nil
-      col < 0 -> nil
-      row >= rows -> nil
-      col >= cols -> nil
-      true->
-        matrix
-        |> Enum.at(row)
-        |> Enum.at(col)
+      row < 0 -> false
+      col < 0 -> false
+      row >= rows -> false
+      col >= cols -> false
+      true -> true
     end
   end
   
-  def risk_level(height) do
-    height + 1
+  def height(matrix, row, col) do
+    if in_matrix?(matrix, row, col) do
+      matrix |> Enum.at(row) |> Enum.at(col)
+    else
+      nil
+    end
   end
   
-  def local_minima?(matrix, row, col) do    
-    neighbors = [
+  def neighbor_coords({ row, col }) do
+    [
       { row-1, col },
       { row, col+1 },
       { row+1, col },
       { row, col-1 },
     ]
-    
-    neighbor_heights = Enum.map(neighbors, fn {row, col} -> height(matrix, row, col) end)
+  end
+  
+  def get_neighbors(matrix, { row, col }) do
+    neighbor_coords({row, col})
+    |> Enum.filter(fn {row, col} -> in_matrix?(matrix, row, col) end)
+    |> Enum.map(fn {row, col} -> { {row, col}, height(matrix, row, col) } end)    
+  end
+  
+  def local_minima?(matrix, row, col) do
+    neighbors = get_neighbors(matrix, { row, col })
+    neighbor_heights = Enum.map(neighbors, fn {_, height} -> height end)
     cell_height = height(matrix, row, col)
     
     Enum.all?(neighbor_heights, fn x -> x > cell_height end)
@@ -61,13 +69,24 @@ defmodule Day9.Part1 do
     {rows, cols} = matrix_size(matrix)
     
     for row <- 0..rows-1, col <- 0..cols-1 do
-      if local_minima?(matrix, row, col), do: height(matrix, row, col), else: nil
+      if local_minima?(matrix, row, col),
+        do: { {row, col}, height(matrix, row, col) },
+        else: nil
     end
     |> Enum.reject(&is_nil/1)
+  end  
+end
+
+defmodule Day9.Part1 do
+  import Day9
+  
+  def risk_level(height) do
+    height + 1
   end
   
   def sum_local_minima(matrix) do
     find_local_minima(matrix)
+    |> Enum.map(fn { _, height } -> height end)
     |> Enum.map(&risk_level/1)
     |> Enum.sum
   end
@@ -79,6 +98,50 @@ defmodule Day9.Part1 do
   end
 end
 
+defmodule Day9.Part2 do
+  import Day9
+
+  def find_basins(matrix) do
+    
+    find_local_minima(matrix)
+    |> Enum.map(fn { {row, col}, height } ->
+      
+      initial = MapSet.new([{ {row, col}, height }])
+      stream = Stream.iterate(0, &(&1+1)) # Use a stream with reduce_while() to reduce forever
+      
+      # Beginning with each local minimum, recursively find neighboring spaces
+      # and add them to a basin if they're flat or uphill from the current point
+      Enum.reduce_while(stream, initial, fn (_, acc) ->
+      
+        neighbors = acc
+        |> Enum.map(fn { {row, col}, height } ->
+          get_neighbors(matrix, { row, col })
+          |> Enum.reject(fn { _, neighbor_height } -> neighbor_height < height end)
+          |> Enum.reject(fn { _, neighbor_height } -> neighbor_height == 9 end)
+        end)
+        |> List.flatten
+        |> MapSet.new
+        
+        new_acc = MapSet.union(acc, neighbors)
+
+        # Quit when we run out of uphill
+        if new_acc == acc, do: {:halt, new_acc}, else: {:cont, new_acc}
+      end)
+      
+    end)
+  end
+
+  def solve(input) do
+    input
+    |> parse_input
+    |> find_basins
+    |> Enum.map(&Enum.count/1)
+    |> Enum.sort(:desc)
+    |> Enum.take(3)
+    |> Enum.reduce(fn x, acc -> x * acc end)
+  end
+end
+
 input = Day9.get_input()
 IO.puts "Part 1: #{Day9.Part1.solve(input)}"
-#IO.puts "Part 2: #{Day9.Part2.solve(input)}"
+IO.puts "Part 2: #{Day9.Part2.solve(input)}"
