@@ -107,23 +107,23 @@ defmodule Day9.Part2 do
     |> Enum.map(fn { {row, col}, height } ->
       
       initial = MapSet.new([{ {row, col}, height }])
-      stream = Stream.iterate(0, &(&1+1)) # Use a stream with reduce_while() to reduce forever
+      { rows, cols } = matrix_size(matrix)
       
       # Beginning with each local minimum, recursively find neighboring spaces
       # and add them to a basin if they're flat or uphill from the current point
-      Enum.reduce_while(stream, initial, fn (_, acc) ->
-      
-        neighbors = acc
-        |> Enum.map(fn { {row, col}, height } ->
-          get_neighbors(matrix, { row, col })
-          |> Enum.reject(fn { _, neighbor_height } -> neighbor_height < height end)
-          |> Enum.reject(fn { _, neighbor_height } -> neighbor_height == 9 end)
-        end)
-        |> List.flatten
-        |> MapSet.new
-        
-        new_acc = MapSet.union(acc, neighbors)
-
+      0..(rows * cols)
+      |> Enum.reduce_while(initial, fn (_, acc) ->
+          neighbors = acc
+          |> Enum.map(fn { {row, col}, height } ->
+            get_neighbors(matrix, { row, col })
+            |> Enum.reject(fn { _, neighbor_height } -> neighbor_height < height end)
+            |> Enum.reject(fn { _, neighbor_height } -> neighbor_height == 9 end)
+          end)
+          |> List.flatten
+          |> MapSet.new
+          
+          new_acc = MapSet.union(acc, neighbors)
+  
         # Quit when we run out of uphill
         if new_acc == acc, do: {:halt, new_acc}, else: {:cont, new_acc}
       end)
