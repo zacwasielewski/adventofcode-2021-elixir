@@ -23,9 +23,24 @@ defmodule Day8Test do
     import Day8.Part1
     
     test "example1" do
-      lines = Day8Test.example_input() |> Day8.parse_input
+      lines = Day8Test.example_input() |> Day8.Part1.parse_input
       
       assert count_1_4_7_8(lines) == 26
+    end
+  end
+
+  defmodule Part2 do
+    use ExUnit.Case
+    import Day8.Part2
+    
+    test "example1" do
+      lines = Day8Test.example_input() |> Day8.Part2.parse_input
+      
+      total = lines
+      |> Enum.map(&decode_entry/1)
+      |> Enum.sum
+      
+      assert total == 61229
     end
   end
 end
