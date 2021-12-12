@@ -16,7 +16,6 @@ defmodule Day11Test do
   defmodule Part1 do
     use ExUnit.Case
     import Day11
-    import Day11.Part1
     
     test "example1" do
       matrix = Day11Test.example_input() |> to_matrix
@@ -108,7 +107,6 @@ defmodule Day11Test do
         Enum.reduce(1..20, matrix, fn _, acc -> step(acc) end)
     end
 
-
     test "example3" do
       input = """
         5483143223
@@ -128,6 +126,80 @@ defmodule Day11Test do
       
       { _, flashes } = Enum.reduce(1..10, initial, fn _, acc -> step_with_flashes(acc) end)
       assert flashes == 204
+    end
+  end
+
+  defmodule Part2 do
+    use ExUnit.Case
+    import Day11
+    
+    test "is_synced" do
+      not_synced = """
+        6988888888
+        9988888888
+        8888888888
+        8888888888
+        8888888888
+        8888888888
+        8888888888
+        8888888888
+        8888888888
+        8888888888
+        """ |> to_matrix
+      synced = """
+        0000000000
+        0000000000
+        0000000000
+        0000000000
+        0000000000
+        0000000000
+        0000000000
+        0000000000
+        0000000000
+        0000000000
+        """ |> to_matrix
+
+      assert flashing_simultaneously?(not_synced) == false
+      assert flashing_simultaneously?(synced) == true
+    end
+
+    test "example" do
+      input_matrix = """
+        5483143223
+        2745854711
+        5264556173
+        6141336146
+        6357385478
+        4167524645
+        2176841721
+        6882881134
+        4846848554
+        5283751526
+        """ |> to_matrix
+      
+      step193_test = """
+        5877777777
+        8877777777
+        7777777777
+        7777777777
+        7777777777
+        7777777777
+        7777777777
+        7777777777
+        7777777777
+        7777777777
+        """ |> to_matrix
+  
+      input_metadata = %{ flashes: 0 }
+      initial = {
+        input_matrix,
+        input_metadata
+      }
+      
+      { step193, _ } = Enum.reduce(1..193, initial, fn _, acc -> Day11.Part2.step(acc) end)
+      assert step193 == step193_test
+      
+      assert Day11.Part2.first_simultaneous_flash(initial) == 195
     end
   end
 end
