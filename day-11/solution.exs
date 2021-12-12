@@ -68,6 +68,12 @@ defmodule Day11 do
     end)    
   end
   
+  def count_flashes(matrix) do
+    matrix
+    |> List.flatten
+    |> Enum.count(fn x -> Enum.member?([:flashing], x) end)
+  end
+  
   def step(matrix) do
     
     # 1. First, the energy level of each octopus increases by 1.
@@ -120,16 +126,88 @@ defmodule Day11 do
     |> set_flashed_to_zero
     
   end
+  
+  def step_with_flashes({ matrix, flashes }) do
+    
+    # 1. First, the energy level of each octopus increases by 1.
+    
+    matrix_incremented = matrix
+    |> Enum.map(fn row -> Enum.map(row, fn col -> col + 1 end) end)
+    
+    # 2. Then, any octopus with an energy level greater than 9 flashes.
+    # This increases the energy level of all adjacent octopuses by 1,
+    # including octopuses that are diagonally adjacent. If this causes an
+    # octopus to have an energy level greater than 9, it also flashes.
+    # This process continues as long as new octopuses keep having their
+    # energy level increased beyond 9. (An octopus can only flash at most
+    # once per step.)
+    
+    initial = { matrix_incremented, flashes }
+    
+    matrix_flashed =
+      Stream.iterate(0, &(&1+1))
+      |> Enum.reduce_while(initial, fn _, acc ->
+      
+        { acc_matrix, acc_flashes } = acc
+        
+        new_matrix = acc_matrix
+        |> Enum.with_index
+        |> Enum.map(fn { cells, row } ->
+          cells
+          |> Enum.with_index
+          |> Enum.map(fn { energy, col } ->
+            
+            case energy do
+              :flashing -> :flashed
+              :flashed -> nil
+              nil -> nil
+              _ ->
+                neighbors = neighbors_energy(acc_matrix, {row, col})
+                neighbors_flashing = neighbors |> Enum.count(fn x -> x == :flashing end)
+                
+                if energy + neighbors_flashing > 9 do
+                  :flashing
+                else
+                  energy + neighbors_flashing
+                end              
+            end          
+          end)
+        end)
+        
+        changed? = new_matrix == acc_matrix
+        new_flashes = count_flashes(new_matrix)
+        
+        if changed? do
+          { :halt, {new_matrix, acc_flashes + new_flashes} }
+        else
+          { :cont, {new_matrix, acc_flashes + new_flashes} }
+        end
+      end)
+
+    # 3. Finally, any octopus that flashed during this step has its
+    # energy level set to 0, as it used all of its energy to flash.
+    
+    { matrix_tmp, flashes_tmp } = matrix_flashed
+    
+    matrix_out = matrix_tmp |> set_flashed_to_zero
+    #IO.inspect(matrix_tmp)
+    
+    { matrix_out, flashes_tmp }
+  end
 end
 
 defmodule Day11.Part1 do
-#  import Day11
-#  
-#  def solve(input) do
-#    input |> parse_input
-#  end
+  import Day11
+ 
+  def solve(input) do
+    matrix = input |> to_matrix
+    initial = { matrix, 0 }
+    
+    { _, flashes } = Enum.reduce(1..100, initial, fn _, acc -> step_with_flashes(acc) end)
+    flashes
+  end
 end
 
-#input = Day11.get_input()
-#IO.puts "Part 1: #{Day11.Part1.solve(input)}"
+input = Day11.get_input()
+IO.puts "Part 1: #{Day11.Part1.solve(input)}"
 #IO.puts "Part 2: #{Day11.Part2.solve(input)}"

@@ -107,5 +107,27 @@ defmodule Day11Test do
       assert to_matrix(step20) ==
         Enum.reduce(1..20, matrix, fn _, acc -> step(acc) end)
     end
+
+
+    test "example3" do
+      input = """
+        5483143223
+        2745854711
+        5264556173
+        6141336146
+        6357385478
+        4167524645
+        2176841721
+        6882881134
+        4846848554
+        5283751526
+        """
+
+      matrix = input |> to_matrix
+      initial = { matrix, 0 }
+      
+      { _, flashes } = Enum.reduce(1..10, initial, fn _, acc -> step_with_flashes(acc) end)
+      assert flashes == 204
+    end
   end
 end
