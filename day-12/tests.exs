@@ -6,6 +6,7 @@ defmodule Day12Test do
   defmodule Part1 do
     use ExUnit.Case
     import Day12
+    import Day12.Part1
     
     test "example1" do
       input = """
@@ -73,6 +74,82 @@ defmodule Day12Test do
       paths = build_paths(moves)
       
       assert Enum.count(paths) == 226     
+    end
+  end
+
+  defmodule Part2 do
+    use ExUnit.Case
+    import Day12
+    import Day12.Part2
+    
+    test "example1" do
+      input = """
+        start-A
+        start-b
+        A-c
+        A-b
+        b-d
+        A-end
+        b-end
+        """
+      
+      segments = parse_input(input)      
+      moves = build_moves(segments)
+      paths = build_paths(moves)
+      
+      assert Enum.count(paths) == 36
+    end
+
+    test "example2" do
+      input = """
+        dc-end
+        HN-start
+        start-kj
+        dc-start
+        dc-HN
+        LN-dc
+        HN-end
+        kj-sa
+        kj-HN
+        kj-dc
+        """
+
+      segments = parse_input(input)      
+      moves = build_moves(segments)
+      #|> IO.inspect
+      paths = build_paths(moves)
+      #|> IO.inspect(limit: 500)
+      
+      assert Enum.count(paths) == 103
+    end
+
+    test "example3" do
+      input = """
+        fs-end
+        he-DX
+        fs-he
+        start-DX
+        pj-DX
+        end-zg
+        zg-sl
+        zg-pj
+        pj-he
+        RW-he
+        fs-DX
+        pj-RW
+        zg-RW
+        start-pj
+        he-WI
+        zg-he
+        pj-fs
+        start-RW
+        """
+
+      segments = parse_input(input)
+      moves = build_moves(segments)
+      paths = build_paths(moves)
+      
+      assert Enum.count(paths) == 3509
     end
   end
 end

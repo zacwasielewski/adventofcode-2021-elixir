@@ -26,6 +26,10 @@ defmodule Day12 do
       |> Map.map(fn {_, endpoints} -> List.delete(endpoints, "start") end)
     end)
   end
+end
+
+defmodule Day12.Part1 do
+  import Day12
   
   def get_next_caves(moves, path) do
     moves
@@ -86,11 +90,106 @@ defmodule Day12 do
       end
     end)
   end
+    
+  def solve(input) do
+    segments = parse_input(input)      
+    moves = build_moves(segments)
+    paths = build_paths(moves)
+    
+    Enum.count(paths)    
+  end
 end
 
-defmodule Day12.Part1 do
+defmodule Day12.Part2 do
   import Day12
   
+  def get_next_caves(moves, path) do
+    moves
+    |> Map.get(List.last(path), [])
+    |> Enum.map(fn cave ->
+      
+      visits = Enum.frequencies(path)
+      small_cave_visits = Map.filter(visits, fn {cave, _} -> String.downcase(cave) == cave end)
+      
+      cond do
+         # Uppercase? We're good to go.
+        cave == String.upcase(cave) ->
+          cave
+        
+        # If we've visited this cave twice already, that's enough
+        Map.get(visits, cave) == 2 ->
+          :halt
+        
+        # If we've only visited this cave once...
+        Map.get(visits, cave) == 1 ->
+          
+          # ...we can visit it again if we haven't visited any other small caves twice
+          if Enum.max(Map.values(small_cave_visits)) < 2 do
+            cave
+          else
+            :halt
+          end
+
+        Map.get(visits, cave) == 0 ->
+          cave
+        
+        true ->
+          cave
+      end
+    end)
+  end
+  
+  def build_paths(moves) do    
+    initial = { moves, _paths = [ ["start"] ] }
+    infinity = Stream.iterate(0, &(&1+1))
+    
+    Enum.reduce_while(infinity, initial, fn _, acc ->
+      { moves, paths } = acc
+
+      # For all paths built so far, find all possible next moves.
+      # Apply those moves to the current paths, branching if needed.
+      new_paths =
+      Enum.reduce(paths, [], fn path, acc ->
+        # Based on the last move of this path, get all next possible moves:
+        next_caves = get_next_caves(moves, path)
+        
+        if Enum.count(next_caves) > 0 do
+          # Generate a new path for every possible next move:
+          new_paths = Enum.map(next_caves, fn next -> path ++ [next] end)
+          
+          # Add the new paths to the accumulator
+          acc ++ new_paths
+        else
+          # If there aren't any next moves, signal that this path is done
+          if List.last(path) != :halt do
+            acc ++ [ path ++ [:halt] ]
+          else
+            acc ++ [path]
+          end
+        end
+      end)
+      |> Enum.uniq
+      #|> IO.inspect
+      
+      new_acc = { moves, new_paths }
+      
+      # Go until every list ends with :halt
+      if Enum.all?(new_paths, fn x -> List.last(x) == :halt end) do
+      
+        # Do some cleanup of the mess we're returning
+        cleaned_paths = new_paths
+        |> Enum.map(fn x -> Enum.drop(x, -1) end)
+        |> Enum.reject(fn x -> List.last(x) !== "end" end)
+      
+        { :halt, cleaned_paths }
+      else
+        { :cont, new_acc }
+      end
+    end)
+    |> Enum.sort
+    #|> IO.inspect
+  end
+    
   def solve(input) do
     segments = parse_input(input)      
     moves = build_moves(segments)
@@ -102,4 +201,4 @@ end
 
 input = Day12.get_input()
 IO.puts "Part 1: #{Day12.Part1.solve(input)}"
-#IO.puts "Part 2: #{Day12.Part2.solve(input)}"
+IO.puts "Part 2: #{Day12.Part2.solve(input)}"
